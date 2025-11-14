@@ -1,55 +1,40 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>익명 메모장</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- PWA 설정 -->
-    <link rel="manifest" href="manifest.json">
-
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        #log { margin-top: 20px; color: #444; }
-        textarea {
-            width: 100%; height: 300px;
-            padding: 12px; font-size: 16px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>익명 메모장</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #app { display: none; }
+    #messages { border: 1px solid #ccc; height: 300px; overflow-y: auto; margin-bottom: 10px; padding: 5px; }
+    textarea { width: 100%; height: 100px; }
+  </style>
 </head>
 <body>
 
-<h2>익명 메모장</h2>
+  <!-- 로그인/회원가입 UI -->
+  <div id="auth">
+    <h3>로그인 / 회원가입</h3>
+    <input id="email" placeholder="이메일">
+    <input id="password" type="password" placeholder="비밀번호">
+    <button onclick="signup()">회원가입</button>
+    <button onclick="login()">로그인</button>
+    <div id="authMsg"></div>
+  </div>
 
-<textarea id="memo" placeholder="여기에 메모하세요..."></textarea>
+  <!-- 메모장 UI -->
+  <div id="app">
+    <h3>익명 메모장</h3>
+    <div id="messages"></div>
+    <textarea id="memo" placeholder="메모 작성"></textarea>
+    <button onclick="sendMemo()">전송</button>
+  </div>
 
-<div id="log"></div>
-
-<script>
-    /* ---- 오프라인 메모 저장 ---- */
-    const memo = document.getElementById("memo");
-    memo.value = localStorage.getItem("memo") || "";
-
-    memo.addEventListener("input", () => {
-        localStorage.setItem("memo", memo.value);
-    });
-
-    /* ---- 웹소켓 (실시간 입장/퇴장) ---- */
-    let log = document.getElementById("log");
-    let ws = new WebSocket("ws://localhost:3001");
-
-    ws.onmessage = (msg) => {
-        const data = JSON.parse(msg.data);
-
-        if (data.type === "join") {
-            log.innerHTML += `<div><b>${data.name}</b> 님이 입장했습니다.</div>`;
-        }
-
-        if (data.type === "leave") {
-            log.innerHTML += `<div><b>${data.name}</b> 님이 나갔습니다.</div>`;
-        }
-    };
-</script>
+  <!-- Supabase 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 메모장 스크립트 -->
+  <script src="script.js"></script>
 
 </body>
 </html>
