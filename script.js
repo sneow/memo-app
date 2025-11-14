@@ -1,6 +1,6 @@
 // 🔹 Supabase 연결
-const SUPABASE_URL = "여기에_프로젝트_URL";
-const SUPABASE_KEY = "여기에_anon_key";
+const SUPABASE_URL = "https://ajmlcukwdqzjzbnbxbqz.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbWxjdWt3ZHF6anpibmJ4YnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMzQ3NTUsImV4cCI6MjA3ODcxMDc1NX0.4xF-B1p0Sk9Qvm6wQ7reFQc-qV4BxxWYVges44lI164";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let ws;
@@ -52,3 +52,4 @@ function sendMemo() {
   if (memo && ws) ws.send(memo);
   document.getElementById("memo").value = "";
 }
+
