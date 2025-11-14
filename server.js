@@ -1,36 +1,31 @@
 const WebSocket = require("ws");
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 3000;
 
-const wss = new WebSocket.Server({ port: 3001 });
-console.log("WebSocket 서버 실행 중 (3001 포트)");
+app.use(express.static("public")); // index.html과 script.js가 public 폴더 안에 있어야 함
 
-// 관리자 전용 로그 (콘솔에만 표시됨)
-function adminLog(message) {
-    console.log("[관리자 로그] " + message);
-}
+const server = app.listen(port, () => console.log(`Server running on port ${port}`));
+
+const wss = new WebSocket.Server({ server });
 
 wss.on("connection", (ws) => {
-    // 랜덤 익명 사용자 이름 부여
-    const randomName = "익명" + Math.floor(Math.random() * 10000);
-    ws.username = randomName;
+  ws.send("익명 메모장에 접속했습니다.");
 
-    // 관리자만 보는 기록
-    adminLog(`${ws.username} 접속함`);
-
-    // 다른 사용자들에게 알림
-    broadcast({ type: "join", name: ws.username });
-
-    // 연결 종료 처리
-    ws.on("close", () => {
-        adminLog(`${ws.username} 나감`);
-        broadcast({ type: "leave", name: ws.username });
-    });
-});
-
-// 전체 사용자에게 메시지 전송
-function broadcast(msg) {
+  ws.on("message", (msg) => {
+    // 모든 클라이언트에게 전송
     wss.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(msg));
-        }
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(msg.toString());
+      }
     });
-}
+  });
+
+  ws.on("close", () => {
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send("누군가 나갔습니다.");
+      }
+    });
+  });
+});
